@@ -1,5 +1,5 @@
 {
-  "proxy": "https://vg-fitmate.onrender.com",
+  "proxy": "https://fitmate-riu7.onrender.com",
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
