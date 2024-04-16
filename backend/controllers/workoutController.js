@@ -29,32 +29,44 @@ const getWorkout = async (req, res) => {
 
 // create new workout
 const createWorkout = async (req, res) => {
-    const {title, load, reps} = req.body
+    const { title, load, reps } = req.body;
 
-    const emptyFields = []
+    const emptyFields = [];
+    const invalidFields = [];
 
-    if (!title){
-        emptyFields.push('title')
+    if (!title) {
+        emptyFields.push('title');
     }
 
-    if (!load){
-        emptyFields.push('load')
-    }
-    if (!reps){
-        emptyFields.push('reps')
-    }
-
-    if (emptyFields.length > 0){
-        return res.status(400).json({error: 'Please fill in all the fields', emptyFields})
+    // Check if load is present and is a positive number
+    if (!load) {
+        emptyFields.push('load');
+    } else if (load <= 0) {
+        invalidFields.push('load');
     }
 
-    try{
-        const user_id = req.user._id
-        const workout = await Workout.create({title, load, reps, user_id})
-        res.status(200).json(workout)
+    // Check if reps are present and are a positive number
+    if (!reps) {
+        emptyFields.push('reps');
+    } else if (reps <= 0) {
+        invalidFields.push('reps');
     }
-    catch (error){
-        res.status(400).json({error: error.message})
+
+    // Consolidate error responses for missing fields or invalid values
+    if (emptyFields.length > 0 || invalidFields.length > 0) {
+        return res.status(400).json({
+            error: 'Please fill in all the fields correctly',
+            emptyFields,
+            invalidFields: invalidFields.length ? `Reps and load must be greater than 0` : undefined
+        });
+    }
+
+    try {
+        const user_id = req.user._id;
+        const workout = await Workout.create({ title, load, reps, user_id });
+        res.status(200).json(workout);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
     }
 }
 // delete a workout
